@@ -37,6 +37,7 @@ export CXXFLAGSc="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/{Data,Maps,Mp3,Sprites,config}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -64,5 +65,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/%{name}/Scripting
 %attr(755,root,root) %{_libdir}/%{name}/Scripting/lib*.so.?.*.*
 %attr(755,root,root) %ghost %{_libdir}/%{name}/Scripting/lib*.so.?
+%{_datadir}/%{name}
 %{_desktopdir}/%{name}client.desktop
 %{_iconsdir}/%{name}client.png
