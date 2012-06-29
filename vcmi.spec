@@ -18,6 +18,7 @@ BuildRequires:	boost-devel
 BuildRequires:	ffmpeg-devel
 BuildRequires:	zlib-devel
 BuildRequires:	libstdc++-devel
+Suggests:	smpeg-libs
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # symbols defined in binaries and main library
