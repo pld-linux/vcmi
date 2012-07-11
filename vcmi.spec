@@ -8,6 +8,7 @@ Source0:	http://dl.dropbox.com/u/22372764/vcmi/packages/%{name}_%{version}.tar.g
 # Source0-md5:	3f67cabb2b395f933b0e14c412e0f0f9
 Source1:	http://download.vcmi.eu/%{name}-data_%{version}.tar.gz
 # Source1-md5:	e6018250e5363c440c5dcbf2492eda24
+Patch0:		boost-1.50.patch
 URL:		http://www.vcmi.eu/
 BuildRequires:	SDL-devel
 BuildRequires:	SDL_image-devel
@@ -30,11 +31,9 @@ H3 engine rewrie (not another mod) with new possibilities.
 
 %prep
 %setup
+%patch0 -p1
 
 %build
-#%%{__aclocal}
-#%%{__autoconf}
-#%%{__automake}
 export CXXFLAGSc="%{rpmcflags}"
 %configure
 %{__make}

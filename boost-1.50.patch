@@ -1,0 +1,11 @@
+--- vcmi-0.89/Global.h~	2012-05-27 21:06:35.000000000 +0200
++++ vcmi-0.89/Global.h	2012-07-11 13:50:38.816526901 +0200
+@@ -50,7 +50,7 @@
+ #include <cstdlib>
+ 
+ //filesystem version 3 causes problems (and it's default as of boost 1.46)
+-#define BOOST_FILESYSTEM_VERSION 2
++#define BOOST_FILESYSTEM_VERSION 3
+ 
+ #include <boost/algorithm/string.hpp>
+ #include <boost/assert.hpp>
