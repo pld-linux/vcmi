@@ -23,6 +23,8 @@ BuildRequires:	libstdc++-devel
 Suggests:	smpeg-libs
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%define		specflags	-fpermissive
+
 # symbols defined in binaries and main library
 %define	skip_post_check_so	vcmi/Scripting/libvcmiERM.so.0.0.0
 
