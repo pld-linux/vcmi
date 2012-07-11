@@ -9,3 +9,45 @@
  
  #include <boost/algorithm/string.hpp>
  #include <boost/assert.hpp>
+--- vcmi-0.89/lib/CLodHandler.cpp~	2012-05-25 13:49:56.000000000 +0200
++++ vcmi-0.89/lib/CLodHandler.cpp	2012-07-11 13:58:30.506510264 +0200
+@@ -284,7 +284,7 @@
+ 			if (boost::filesystem::is_directory(dir->status()))
+ 			{
+ 				path.resize(dir.level()+1);
+-				path.back() = dir->path().leaf();
++				path.back() = dir->path().filename().string();
+ 			}
+ 			if(boost::filesystem::is_regular(dir->status()))
+ 			{
+@@ -294,7 +294,7 @@
+ 				for (size_t i=0; i<dir.level() && i<path.size(); i++)
+ 					e.realName += path[i] + '/';
+ 
+-				e.realName += dir->path().leaf();
++				e.realName += dir->path().filename().string();
+ 
+ 				initEntry(e, e.realName);
+ 
+--- vcmi-0.89/client/CPlayerInterface.cpp~	2012-05-20 00:57:24.000000000 +0200
++++ vcmi-0.89/client/CPlayerInterface.cpp	2012-07-11 14:01:17.689846035 +0200
+@@ -1567,7 +1567,7 @@
+ 	{
+ 		if(is_regular(dir->status()))
+ 		{
+-			std::string name = dir->path().leaf();
++			std::string name = dir->path().filename().string();
+ 			if(starts_with(name, namePrefix) && ends_with(name, ".vlgm1"))
+ 			{
+ 				char nr = name[namePrefix.size()];
+--- vcmi-0.89/Scripting/ERM/ERMInterpreter.cpp~	2012-02-16 18:10:58.000000000 +0100
++++ vcmi-0.89/Scripting/ERM/ERMInterpreter.cpp	2012-07-11 14:04:08.642118903 +0200
+@@ -376,7 +376,7 @@
+ 	{
+ 		if(is_regular(dir->status()))
+ 		{
+-			std::string name = dir->path().leaf();
++			std::string name = dir->path().filename().string();
+ 			if( boost::algorithm::ends_with(name, ".erm") ||
+ 				boost::algorithm::ends_with(name, ".verm") )
+ 			{
