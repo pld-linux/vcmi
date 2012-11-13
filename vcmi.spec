@@ -1,21 +1,22 @@
 Summary:	Heroes 3: WoG recreated
 Name:		vcmi
-Version:	0.89
-Release:	4
+Version:	0.90
+Release:	1
 License:	GPL v2+
 Group:		X11/Applications/Games
-Source0:	http://dl.dropbox.com/u/22372764/vcmi/packages/%{name}_%{version}.tar.gz
-# Source0-md5:	3f67cabb2b395f933b0e14c412e0f0f9
-Source1:	http://download.vcmi.eu/%{name}-data_%{version}.tar.gz
-# Source1-md5:	e6018250e5363c440c5dcbf2492eda24
-Patch0:		boost-1.50.patch
+Source0:	http://download.vcmi.eu/%{name}_%{version}.tar.gz
+# Source0-md5:	ab6772d9b8010925e6c00847b7c63c0d
+Source1:	http://download.vcmi.eu/core.zip
+# Source1-md5:	5cf75d588cc53b93aceb809a6068ae37
+Source2:	ax_boost_iostreams.m4
+Patch0:		boost-build.patch
 URL:		http://www.vcmi.eu/
 BuildRequires:	SDL-devel
 BuildRequires:	SDL_image-devel
 BuildRequires:	SDL_mixer-devel
 BuildRequires:	SDL_ttf-devel
-#BuildRequires:	autoconf >= 2.68
-#BuildRequires:	automake >= 1.11
+BuildRequires:	autoconf >= 2.68
+BuildRequires:	automake >= 1.11
 BuildRequires:	boost-devel
 BuildRequires:	ffmpeg-devel
 BuildRequires:	zlib-devel
@@ -32,25 +33,36 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 H3 engine rewrie (not another mod) with new possibilities.
 
 %prep
-%setup
+%setup -q
 %patch0 -p1
+cp %{SOURCE2} aclocal/m4
 
 %build
-export CXXFLAGSc="%{rpmcflags}"
+%{__aclocal} -I aclocal/m4
+%{__autoconf}
+%{__automake}
+export CXXFLAGS="%{rpmcflags}"
 %configure
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_datadir}/%{name}/{Data,Maps,Mp3,Sprites,config}
+install -d $RPM_BUILD_ROOT%{_datadir}/%{name} \
+	$RPM_BUILD_ROOT%{_pixmapsdir} \
+	$RPM_BUILD_ROOT%{_iconsdir}/hicolor/{64x64,48x48,32x32}/apps
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+install client/icons/vcmiclient.xpm $RPM_BUILD_ROOT%{_pixmapsdir}/vcmiclient.xpm
+install client/icons/vcmiclient.64x64.png $RPM_BUILD_ROOT%{_iconsdir}/hicolor/64x64/apps/vcmiclient.png
+install client/icons/vcmiclient.48x48.png $RPM_BUILD_ROOT%{_iconsdir}/hicolor/48x48/apps/vcmiclient.png
+install client/icons/vcmiclient.32x32.png $RPM_BUILD_ROOT%{_iconsdir}/hicolor/32x32/apps/vcmiclient.png
+
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}/AI/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{name}{/Scripting,}/*.{la,so}
 
-%{__tar} zxf %{SOURCE1} -C $RPM_BUILD_ROOT%{_datadir}/%{name}
+%{__unzip} %{SOURCE1} -d $RPM_BUILD_ROOT%{_datadir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -69,4 +81,5 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %ghost %{_libdir}/%{name}/Scripting/lib*.so.?
 %{_datadir}/%{name}
 %{_desktopdir}/%{name}client.desktop
-%{_iconsdir}/%{name}client.png
+%{_pixmapsdir}/%{name}client.xpm
+%{_iconsdir}/hicolor/*x*/apps/%{name}client.png
