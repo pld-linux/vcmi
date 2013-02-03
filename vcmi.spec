@@ -1,7 +1,7 @@
 Summary:	Heroes 3: WoG recreated
 Name:		vcmi
 Version:	0.90
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		X11/Applications/Games
 Source0:	http://download.vcmi.eu/%{name}_%{version}.tar.gz
