@@ -18,6 +18,7 @@ BuildRequires:	SDL_ttf-devel
 BuildRequires:	autoconf >= 2.68
 BuildRequires:	automake >= 1.11
 BuildRequires:	boost-devel
+BuildRequires:	cmake >= 2.8.5
 BuildRequires:	ffmpeg-devel
 BuildRequires:	zlib-devel
 BuildRequires:	libstdc++-devel
