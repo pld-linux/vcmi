@@ -1,7 +1,7 @@
 Summary:	Heroes 3: WoG recreated
 Name:		vcmi
 Version:	0.98
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		X11/Applications/Games
 Source0:	https://github.com/vcmi/vcmi/archive/%{version}/%{name}-%{version}.tar.gz
@@ -9,6 +9,7 @@ Source0:	https://github.com/vcmi/vcmi/archive/%{version}/%{name}-%{version}.tar.
 Source1:	http://download.vcmi.eu/core.zip
 # Source1-md5:	5cf75d588cc53b93aceb809a6068ae37
 Patch0:		boost-1.58.patch
+Patch1:		ffmpeg3.patch
 URL:		http://www.vcmi.eu/
 BuildRequires:	Qt5Network-devel
 BuildRequires:	qt5-build
@@ -36,6 +37,7 @@ H3 engine rewrie (not another mod) with new possibilities.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 install -d build

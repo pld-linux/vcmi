@@ -1,0 +1,52 @@
+diff -ur vcmi-0.98.orig/client/CVideoHandler.cpp vcmi-0.98/client/CVideoHandler.cpp
+--- vcmi-0.98.orig/client/CVideoHandler.cpp	2015-04-01 09:34:22.000000000 +0200
++++ vcmi-0.98/client/CVideoHandler.cpp	2016-03-29 01:45:43.689696331 +0200
+@@ -155,7 +155,7 @@
+ 	}
+ 
+ 	// Allocate video frame
+-	frame = avcodec_alloc_frame();
++	frame = av_frame_alloc();
+ 	
+ 	//setup scaling
+ 	
+@@ -201,21 +201,21 @@
+ #endif
+ 	{ // Convert the image into YUV format that SDL uses
+ 		sws = sws_getContext(codecContext->width, codecContext->height, codecContext->pix_fmt, 
+-							 pos.w, pos.h, PIX_FMT_YUV420P, 
++							 pos.w, pos.h, AV_PIX_FMT_YUV420P, 
+ 							 SWS_BICUBIC, nullptr, nullptr, nullptr);
+ 	}
+ 	else
+ 	{
+ 
+-		PixelFormat screenFormat = PIX_FMT_NONE;
++		AVPixelFormat screenFormat = AV_PIX_FMT_NONE;
+ 		if (screen->format->Bshift > screen->format->Rshift)
+ 		{
+ 			// this a BGR surface
+ 			switch (screen->format->BytesPerPixel)
+ 			{
+-				case 2: screenFormat = PIX_FMT_BGR565; break;
+-				case 3: screenFormat = PIX_FMT_BGR24; break;
+-				case 4: screenFormat = PIX_FMT_BGR32; break;
++				case 2: screenFormat = AV_PIX_FMT_BGR565; break;
++				case 3: screenFormat = AV_PIX_FMT_BGR24; break;
++				case 4: screenFormat = AV_PIX_FMT_BGR32; break;
+ 				default: return false;
+ 			}
+ 		}
+@@ -224,9 +224,9 @@
+ 			// this a RGB surface
+ 			switch (screen->format->BytesPerPixel)
+ 			{
+-				case 2: screenFormat = PIX_FMT_RGB565; break;
+-				case 3: screenFormat = PIX_FMT_RGB24; break;
+-				case 4: screenFormat = PIX_FMT_RGB32; break;
++				case 2: screenFormat = AV_PIX_FMT_RGB565; break;
++				case 3: screenFormat = AV_PIX_FMT_RGB24; break;
++				case 4: screenFormat = AV_PIX_FMT_RGB32; break;
+ 				default: return false;
+ 			}
+ 		}
