@@ -1,0 +1,221 @@
+--- vcmi-0.99/lib/serializer/Connection.h.orig	2019-05-09 18:28:47.786130450 +0200
++++ vcmi-0.99/lib/serializer/Connection.h	2019-05-09 20:37:32.790815761 +0200
+@@ -14,37 +14,20 @@
+ #include "BinaryDeserializer.h"
+ #include "BinarySerializer.h"
+ 
++#include <boost/asio/basic_stream_socket.hpp>
++#include <boost/asio/basic_socket_acceptor.hpp>
++#include <boost/asio/io_service.hpp>
++#include <boost/asio/ip/tcp.hpp>
++
+ struct CPack;
+ 
+ namespace boost
+ {
+-	namespace asio
+-	{
+-		namespace ip
+-		{
+-			class tcp;
+-		}
+-
+-#if BOOST_VERSION >= 106600  // Boost version >= 1.66
+-		class io_context;
+-		typedef io_context io_service;
+-#else
+-		class io_service;
+-#endif
+-
+-		template <typename Protocol> class stream_socket_service;
+-		template <typename Protocol,typename StreamSocketService>
+-		class basic_stream_socket;
+-
+-		template <typename Protocol> class socket_acceptor_service;
+-		template <typename Protocol,typename SocketAcceptorService>
+-		class basic_socket_acceptor;
+-	}
+ 	class mutex;
+ }
+ 
+-typedef boost::asio::basic_stream_socket < boost::asio::ip::tcp , boost::asio::stream_socket_service<boost::asio::ip::tcp>  > TSocket;
+-typedef boost::asio::basic_socket_acceptor<boost::asio::ip::tcp, boost::asio::socket_acceptor_service<boost::asio::ip::tcp> > TAcceptor;
++typedef boost::asio::basic_stream_socket<boost::asio::ip::tcp> TSocket;
++typedef boost::asio::basic_socket_acceptor<boost::asio::ip::tcp> TAcceptor;
+ 
+ /// Main class for network communication
+ /// Allows establishing connection and bidirectional read-write
+--- vcmi-0.99/lib/serializer/Connection.cpp.orig	2016-11-01 19:26:09.000000000 +0100
++++ vcmi-0.99/lib/serializer/Connection.cpp	2019-05-10 15:40:32.325291811 +0200
+@@ -5,9 +5,6 @@
+ #include "../mapping/CMap.h"
+ #include "../CGameState.h"
+ 
+-#if BOOST_VERSION >= 106600
+-#define BOOST_ASIO_ENABLE_OLD_SERVICES
+-#endif
+ #include <boost/asio.hpp>
+ 
+ /*
+@@ -120,7 +117,7 @@
+ 	throw std::runtime_error("Can't establish connection :(");
+ }
+ CConnection::CConnection(TSocket * Socket, std::string Name )
+-	:iser(this), oser(this), socket(Socket),io_service(&Socket->get_io_service()), name(Name)//, send(this), rec(this)
++	:iser(this), oser(this), socket(Socket),io_service(&Socket->get_executor().context()), name(Name)//, send(this), rec(this)
+ {
+ 	init();
+ }
+--- vcmi-0.99/lib/CBattleCallback.cpp.orig	2016-11-01 19:26:09.000000000 +0100
++++ vcmi-0.99/lib/CBattleCallback.cpp	2019-05-10 16:07:53.901237054 +0200
+@@ -499,7 +499,7 @@
+ 	else if(defender->owner != battleGetOwner(defender))
+ 		return true;//mind controlled unit is attackable for both sides
+ 	else
+-		return (battleGetOwner(attacker) == battleGetOwner(defender)) == positivness;
++		return (battleGetOwner(attacker) == battleGetOwner(defender)) == bool(positivness);
+ }
+ 
+ si8 CBattleInfoCallback::battleHasWallPenalty( const CStack * stack, BattleHex destHex ) const
+@@ -1357,9 +1357,9 @@
+ 
+ 	std::vector<DistStack> stackPairs;
+ 
+-	std::vector<const CStack *> possibleStacks = battleGetStacksIf([=](const CStack * s)
++	std::vector<const CStack *> possibleStacks = battleGetStacksIf([=](const CStack * s) -> bool
+ 	{
+-		return s->isValidTarget(false) && s != closest && (boost::logic::indeterminate(attackerOwned) || s->attackerOwned == attackerOwned);
++		return s->isValidTarget(false) && s != closest && (boost::logic::indeterminate(attackerOwned) || s->attackerOwned == bool(attackerOwned));
+ 	});
+ 
+ 	for(const CStack * st : possibleStacks)
+--- vcmi-0.99/client/windows/CAdvmapInterface.cpp.orig	2016-11-01 19:26:09.000000000 +0100
++++ vcmi-0.99/client/windows/CAdvmapInterface.cpp	2019-05-10 16:27:02.158039352 +0200
+@@ -781,7 +781,7 @@
+ 	if(boost::logic::indeterminate(hasPath))
+ 		hasPath = LOCPLINT->paths[h].nodes.size() ? true : false;
+ 
+-	moveHero->block(!hasPath || (h->movement == 0));
++	moveHero->block(!bool(hasPath) || (h->movement == 0));
+ }
+ 
+ void CAdvMapInt::updateSpellbook(const CGHeroInstance *h)
+--- vcmi-0.99/server/CVCMIServer.h.orig	2019-05-09 18:28:47.786130450 +0200
++++ vcmi-0.99/server/CVCMIServer.h	2019-05-10 17:00:46.894142311 +0200
+@@ -12,40 +12,19 @@
+  *
+  */
+ 
++#include <boost/asio/basic_stream_socket.hpp>
++#include <boost/asio/basic_socket_acceptor.hpp>
++#include <boost/asio/io_service.hpp>
++#include <boost/asio/ip/tcp.hpp>
++
+ class CMapInfo;
+ 
+ class CConnection;
+ struct CPackForSelectionScreen;
+ class CGameHandler;
+ 
+-namespace boost
+-{
+-	namespace asio
+-	{
+-		namespace ip
+-		{
+-			class tcp;
+-		}
+-
+-#if BOOST_VERSION >= 106600  // Boost version >= 1.66
+-		class io_context;
+-		typedef io_context io_service;
+-#else
+-		class io_service;
+-#endif
+-
+-		template <typename Protocol> class stream_socket_service;
+-		template <typename Protocol,typename StreamSocketService>
+-		class basic_stream_socket;
+-
+-		template <typename Protocol> class socket_acceptor_service;
+-		template <typename Protocol,typename SocketAcceptorService>
+-		class basic_socket_acceptor;
+-	}
+-};
+-
+-typedef boost::asio::basic_socket_acceptor<boost::asio::ip::tcp, boost::asio::socket_acceptor_service<boost::asio::ip::tcp> > TAcceptor;
+-typedef boost::asio::basic_stream_socket < boost::asio::ip::tcp , boost::asio::stream_socket_service<boost::asio::ip::tcp>  > TSocket;
++typedef boost::asio::basic_socket_acceptor<boost::asio::ip::tcp> TAcceptor;
++typedef boost::asio::basic_stream_socket<boost::asio::ip::tcp> TSocket;
+ 
+ class CVCMIServer
+ {
+--- vcmi-0.99/server/CVCMIServer.cpp.orig	2019-05-10 18:15:18.709042066 +0200
++++ vcmi-0.99/server/CVCMIServer.cpp	2019-05-10 18:17:35.062864054 +0200
+@@ -1,8 +1,5 @@
+ #include "StdInc.h"
+ 
+-#if BOOST_VERSION >= 106600
+-#define BOOST_ASIO_ENABLE_OLD_SERVICES
+-#endif
+ #include <boost/asio.hpp>
+ 
+ #include "../lib/filesystem/Filesystem.h"
+@@ -168,8 +165,8 @@
+ 
+ 			if(acceptor)
+ 			{
+-				acceptor->get_io_service().reset();
+-				acceptor->get_io_service().poll();
++				static_cast<boost::asio::io_context&>(acceptor->get_executor().context()).reset();
++				static_cast<boost::asio::io_context&>(acceptor->get_executor().context()).poll();
+ 			}
+ 		} //frees lock
+ 
+@@ -230,7 +227,7 @@
+ 	assert(!upcomingConnection);
+ 	assert(acceptor);
+ 
+-	upcomingConnection = new TSocket(acceptor->get_io_service());
++	upcomingConnection = new TSocket(acceptor->get_executor());
+ 	acceptor->async_accept(*upcomingConnection, std::bind(&CPregameServer::connectionAccepted, this, _1));
+ }
+ 
+@@ -415,7 +412,7 @@
+ 
+ 	boost::system::error_code error;
+ 	logNetwork->info("Listening for connections at port %d", acceptor->local_endpoint().port());
+-	auto s = new boost::asio::ip::tcp::socket(acceptor->get_io_service());
++	auto s = new boost::asio::ip::tcp::socket(acceptor->get_executor());
+ 	boost::thread acc(std::bind(vaccept,acceptor,s,&error));
+ #ifndef VCMI_ANDROID
+ 	sr->setToTrueAndNotify();
+@@ -483,7 +480,7 @@
+ 		}
+ 		else
+ 		{
+-			auto s = new boost::asio::ip::tcp::socket(acceptor->get_io_service());
++			auto s = new boost::asio::ip::tcp::socket(acceptor->get_executor());
+ 			acceptor->accept(*s,error);
+ 			if(error) //retry
+ 			{
+--- vcmi-0.99/AI/VCAI/AIUtility.h.orig	2016-11-01 19:26:09.000000000 +0100
++++ vcmi-0.99/AI/VCAI/AIUtility.h	2019-05-10 17:37:38.490708060 +0200
+@@ -167,5 +167,5 @@
+ public:
+ 	CDistanceSorter(const CGHeroInstance * hero): hero(hero) {}
+ 
+-	bool operator ()(const CGObjectInstance *lhs, const CGObjectInstance *rhs);
++	bool operator ()(const CGObjectInstance *lhs, const CGObjectInstance *rhs) const;
+ };
+--- vcmi-0.99/AI/VCAI/AIUtility.cpp.orig	2016-11-01 19:26:09.000000000 +0100
++++ vcmi-0.99/AI/VCAI/AIUtility.cpp	2019-05-10 17:39:23.702884397 +0200
+@@ -179,7 +179,7 @@
+ 	return oss.str();
+ }
+ 
+-bool CDistanceSorter::operator ()(const CGObjectInstance *lhs, const CGObjectInstance *rhs)
++bool CDistanceSorter::operator ()(const CGObjectInstance *lhs, const CGObjectInstance *rhs) const
+ {
+ 	const CGPathNode *ln = ai->myCb->getPathsInfo(hero)->getPathInfo(lhs->visitablePos()),
+ 	                 *rn = ai->myCb->getPathsInfo(hero)->getPathInfo(rhs->visitablePos());
