@@ -86,9 +86,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/vcmiserver
 %dir %{_libdir}/%{name}
 %attr(755,root,root) %{_libdir}/%{name}/libvcmi.so
-%attr(755,root,root) %{_libdir}/%{name}/libvcmiERM.so
 %dir %{_libdir}/%{name}/AI
 %attr(755,root,root) %{_libdir}/%{name}/AI/lib*.so
+%dir %{_libdir}/%{name}/scripting
+%attr(755,root,root) %{_libdir}/%{name}/scripting/libvcmiERM.so
 %{_datadir}/%{name}
 %{_desktopdir}/vcmiclient.desktop
 %{_desktopdir}/vcmilauncher.desktop
