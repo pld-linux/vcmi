@@ -25,7 +25,7 @@ index 0a842d1d3..ae1810e8b 100644
 +#endif
  #include <boost/asio.hpp>
  
- using namespace boost;
+ /*
 diff --git a/lib/serializer/Connection.h b/lib/serializer/Connection.h
 index b6ceee7a0..cb134e2b6 100644
 --- a/lib/serializer/Connection.h
