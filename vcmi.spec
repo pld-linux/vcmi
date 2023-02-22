@@ -26,6 +26,7 @@ BuildRequires:	ffmpeg-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	minizip-devel
 BuildRequires:	qt5-build >= 5
+BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRequires:	zlib-devel
 Suggests:	smpeg-libs
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
