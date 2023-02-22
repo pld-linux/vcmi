@@ -11,6 +11,7 @@ Source1:	http://download.vcmi.eu/core.zip
 # Source1-md5:	5cf75d588cc53b93aceb809a6068ae37
 Patch0:		boost-1.66.patch
 Patch1:		%{name}-boost.patch
+Patch2:		no-werror.patch
 URL:		http://www.vcmi.eu/
 BuildRequires:	Qt5Network-devel >= 5
 BuildRequires:	Qt5Widgets-devel >= 5
@@ -45,6 +46,7 @@ możliwościami.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 install -d build
