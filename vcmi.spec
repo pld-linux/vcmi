@@ -2,7 +2,7 @@ Summary:	"Heroes 3: WoG recreated
 Summary(pl.UTF-8):	Gra "Heroes 3: WoG" stworzona od nowa
 Name:		vcmi
 Version:	0.99
-Release:	7
+Release:	8
 License:	GPL v2+
 Group:		X11/Applications/Games
 Source0:	https://github.com/vcmi/vcmi/archive/%{version}/%{name}-%{version}.tar.gz
