@@ -21,6 +21,7 @@ BuildRequires:	boost-devel >= 1.50
 BuildRequires:	cmake >= 2.8.12
 # avformat, swscale
 BuildRequires:	ffmpeg-devel
+BuildRequires:	fuzzylite-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	minizip-devel
 BuildRequires:	qt5-build >= 5
@@ -50,7 +51,8 @@ install -d build
 cd build
 %cmake .. \
 	-DENABLE_ERM=ON \
-	-DENABLE_EDITOR=ON
+	-DENABLE_EDITOR=ON \
+	-DFORCE_BUNDLED_FL=OFF
 
 %{__make}
 
