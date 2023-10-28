@@ -1,3 +1,12 @@
+#
+# Conditional build:
+%bcond_without	lua		# build LUA scripting
+#
+
+%ifarch x32
+%undefine	with_lua
+%endif
+
 Summary:	"Heroes 3: WoG recreated
 Summary(pl.UTF-8):	Gra "Heroes 3: WoG" stworzona od nowa
 Name:		vcmi
@@ -24,11 +33,7 @@ BuildRequires:	cmake >= 2.8.12
 BuildRequires:	ffmpeg-devel
 BuildRequires:	fuzzylite-devel
 BuildRequires:	libstdc++-devel
-%ifarch x32
-BuildRequires:	lua53-devel
-%else
-BuildRequires:	luajit-devel
-%endif
+%{?with_lua:BuildRequires:	luajit-devel}
 BuildRequires:	minizip-devel
 BuildRequires:	qt5-build >= 5
 BuildRequires:	rpmbuild(macros) >= 1.605
@@ -57,12 +62,8 @@ możliwościami.
 install -d build
 cd build
 %cmake .. \
-%ifarch x32
-	-DLUA_INCLUDE_DIR:PATH=/usr/include/lua5.3 \
-	-DLUA_LIBRARY:FILEPATH=/usr/libx32/liblua5.3.so \
-%endif
-	-DENABLE_ERM=ON \
-	-DENABLE_LUA=ON \
+	%cmake_on_off lua ENABLE_LUA \
+	%cmake_on_off lua ENABLE_ERM \
 	-DENABLE_EDITOR=ON \
 	-DFORCE_BUNDLED_FL=OFF
 
@@ -94,9 +95,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/%{name}/libvcmi.so
 %dir %{_libdir}/%{name}/AI
 %attr(755,root,root) %{_libdir}/%{name}/AI/lib*.so
+%if %{with lua}
 %dir %{_libdir}/%{name}/scripting
 %attr(755,root,root) %{_libdir}/%{name}/scripting/libvcmiERM.so
 %attr(755,root,root) %{_libdir}/%{name}/scripting/libvcmiLua.so
+%endif
 %{_datadir}/%{name}
 %{_desktopdir}/vcmiclient.desktop
 %{_desktopdir}/vcmieditor.desktop
