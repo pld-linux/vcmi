@@ -10,6 +10,7 @@ Source0:	https://github.com/vcmi/vcmi/archive/%{version}/%{name}-%{version}.tar.
 Source1:	http://download.vcmi.eu/core.zip
 # Source1-md5:	5cf75d588cc53b93aceb809a6068ae37
 Patch0:		erm.patch
+Patch1:		absolute-dirs.patch
 URL:		http://www.vcmi.eu/
 BuildRequires:	Qt5Network-devel >= 5
 BuildRequires:	Qt5Widgets-devel >= 5
@@ -23,6 +24,11 @@ BuildRequires:	cmake >= 2.8.12
 BuildRequires:	ffmpeg-devel
 BuildRequires:	fuzzylite-devel
 BuildRequires:	libstdc++-devel
+%ifarch x32
+BuildRequires:	lua53-devel
+%else
+BuildRequires:	luajit-devel
+%endif
 BuildRequires:	minizip-devel
 BuildRequires:	qt5-build >= 5
 BuildRequires:	rpmbuild(macros) >= 1.605
@@ -45,12 +51,18 @@ możliwościami.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 install -d build
 cd build
 %cmake .. \
+%ifarch x32
+	-DLUA_INCLUDE_DIR:PATH=/usr/include/lua5.3 \
+	-DLUA_LIBRARY:FILEPATH=/usr/libx32/liblua5.3.so \
+%endif
 	-DENABLE_ERM=ON \
+	-DENABLE_LUA=ON \
 	-DENABLE_EDITOR=ON \
 	-DFORCE_BUNDLED_FL=OFF
 
